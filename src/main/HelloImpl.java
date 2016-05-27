@@ -10,20 +10,20 @@ public class HelloImpl extends UnicastRemoteObject implements Hello {
 
     protected Message leDernierMessage;
 
-    public HelloImpl() throws RemoteException{
+    public HelloImpl() throws RemoteException {
         super();
         leDernierMessage = new Message("");
     }
 
     @Override
     public void afficher(String chaine) throws RemoteException {
-        System.out.println("Invocation de HelloImpl.afficher(chaine=" + chaine+")");
+        System.out.println("Invocation de HelloImpl.afficher(chaine=" + chaine + ")");
         leDernierMessage = new Message(chaine);
     }
 
     @Override
     public Message getDernierMessage() throws RemoteException {
         System.out.println("Invocation de HelloImpl.getDernierMessage()");
-        return leDernierMessage ;
+        return leDernierMessage;
     }
 }

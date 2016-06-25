@@ -1,28 +1,28 @@
 package rmiHello;
 
-/**
- * Created by sylvie on 26/05/16.
- */
-public class HelloImpl extends java.rmi.server.UnicastRemoteObject
-        implements Hello
-{
-    // Attribut stockant le dernier message affiche.
-    protected Message leDernierMessage;
-    // Le constructeur.
-    public HelloImpl() throws java.rmi.RemoteException {
-// Appel du constructeur java.rmi.server.UnicastRemoteObject.
-// Peut soulever l’exception java.rmi.RemoteException.
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class HelloImpl extends UnicastRemoteObject implements Hello {
+
+    protected Message lastMessage;
+
+    public HelloImpl() throws RemoteException {
         super();
-        leDernierMessage = new Message("");
+        this.lastMessage = new Message("");
     }
-    // Afficher une chaine de caracteres.
-    public void afficher(String chaine) throws java.rmi.RemoteException {
-        System.out.println("Invocation de rmiHello.HelloImpl.afficher(chaine=" + chaine + ")");
-        leDernierMessage = new Message(chaine);
+
+    public void show(String chaine) throws RemoteException {
+        this.log("show");
+        this.lastMessage = new Message(chaine);
     }
-    // Obtenir le dernier message affiche.
-    public Message getDernierMessage() throws java.rmi.RemoteException {
-        System.out.println("Invocation de rmiHello.HelloImpl.getDernierMessage()");
-        return leDernierMessage;
+
+    public Message getLastMessage() throws RemoteException {
+        this.log("getLastMessage");
+        return this.lastMessage;
+    }
+
+    public void log(String message){
+        System.out.println("HelloImp: " + message);
     }
 }

@@ -1,21 +1,20 @@
 package rmiHello;
 
-/**
- * Created by sylvie on 26/05/16.
- */
-public class Message implements java.io.Serializable {
-    //L’état interne du message.
-    protected java.util.Date date;
-    protected String texte;
+import java.io.Serializable;
+import java.util.Date;
 
-    // Le constructeur avec un texte.
-    public Message(String texte) {
-        this.date = new java.util.Date();
-        this.texte = texte;
+public class Message implements Serializable {
+
+    protected java.util.Date date;
+
+    protected String text;
+
+    public Message(String text) {
+        this.date = new Date();
+        this.text = text;
     }
 
-    // Pour afficher le message.
     public String toString() {
-        return "rmiHello.Message[date=" + date + ",texte=" + texte + "]";
+        return "rmiHello.Message[date=" + date + ",text=" + text + "]";
     }
 }

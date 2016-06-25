@@ -1,136 +1,85 @@
 package rmiHello;
 
-public class ClientIHM
-        extends java.awt.Frame
-{
-    //
-    // Etat interne.
-    //
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.rmi.Naming;
 
-    protected Hello helloDistant = null;
+public class ClientIHM  extends Frame {
 
-    protected java.awt.TextField nomServeur = null;
-    protected java.awt.TextField entree = null;
-    protected java.awt.TextField reponse = null;
+    protected Hello remoteHello;
 
-    /**
-     ** Le constructeur avec un titre et l'URL du Hello distant.
-     **
-     ** @param titre Le titre de la fenêtre.
-     ** @param urlHello L'URL de l'objet Hello RMI.
-     **
-     **/
-    public ClientIHM(String titre, String urlHello)
-    {
-        // Appel du constructeur de java.awt.Frame.
-        //
-        super(titre);
+    protected TextField serverName;
+    protected TextField entry;
+    protected TextField answer;
 
-        // Fixer le Layout.
-        //
-        setLayout (new java.awt.GridLayout(6,1));
+    public ClientIHM(String title, String urlHello) {
 
-        // Ajouter les composants graphiques.
-        //
-        add(new java.awt.Label("URL de l'objet Hello : "));
-        nomServeur = new java.awt.TextField(40);
-        add(nomServeur);
-        add(new java.awt.Label("Texte à envoyer à l'objet Hello : "));
-        entree = new java.awt.TextField(40);
-        add(entree);
-        add(new java.awt.Label("Réponse de l'objet Hello : "));
-        reponse = new java.awt.TextField(40);
-        add(reponse);
+        super(title);
+        this.setLayout (new GridLayout(6,1));
 
-        // Ajouter un gérant d'événements pour la fenêtre.
-        //
-        addWindowListener (new GestionnaireQuitter());
+        this.add(new Label("Hello object URL: "));
+        this.serverName = new TextField(40);
+        this.add(serverName);
+        this.add(new Label("Text to send to the Hello object: "));
+        this.entry = new TextField(40);
+        this.add(entry);
+        this.add(new Label("Answer: "));
+        this.answer = new TextField(40);
+        this.add(answer);
 
-        // Ajouter un gérant d'événements pour le champ nomServeur.
-        //
-        nomServeur.addActionListener (new GestionnaireNomServeur());
+        this.addWindowListener (new QuitAdapter());
+        this.serverName.addActionListener (new ServerNameListener());
+        this.entry.addActionListener (new EntryListener());
 
-        // Ajouter un gérant d'événements pour le champ entree.
-        //
-        entree.addActionListener (new GestionnaireEntree());
-
-        // Fixer l'URL de base.
-        //
-        nomServeur.setText(urlHello);
-        connecter_serveur(urlHello);
+        this.serverName.setText(urlHello);
+        this.connectServer(urlHello);
     }
 
-    // Le gestionnaire des événements liés à la fenêtre.
-    //
-    protected class GestionnaireQuitter
-            extends java.awt.event.WindowAdapter
-    {
-        // Fermeture de la fenêtre.
-        //
-        public void windowClosing(java.awt.event.WindowEvent e)
-        {
+    public void connectServer(String serverName) {
+        try {
+            this.remoteHello = (Hello) Naming.lookup(serverName);
+            this.answer.setText(null);
+        } catch(Exception e) {
+            this.answer.setText (e.toString());
+        }
+    }
+
+    protected class QuitAdapter extends WindowAdapter {
+
+        public void windowClosing(java.awt.event.WindowEvent e){
             System.exit (0);
         }
+
     }
 
-    public void connecter_serveur (String nomServeur)
-    {
-        try {
-            helloDistant = (Hello) java.rmi.Naming.lookup(nomServeur);
-            reponse.setText (null);
-        } catch(Exception ex) {
-            reponse.setText ( ex.toString() );
+    protected class ServerNameListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            connectServer(serverName.getText());
         }
+
     }
 
-    // Le gestionnaire des événements liés au champ nomServeur.
-    //
-    protected class GestionnaireNomServeur
-            implements java.awt.event.ActionListener
-    {
-        // Validation du champ.
-        //
-        public void actionPerformed(java.awt.event.ActionEvent e)
-        {
-            connecter_serveur (nomServeur.getText());
-        }
-    }
+    protected class EntryListener implements ActionListener {
 
-    // Le gestionnaire des événements liés au champ 'entree'.
-    //
-    protected class GestionnaireEntree
-            implements java.awt.event.ActionListener
-    {
-        // Validation du champ.
-        //
-        public void actionPerformed(java.awt.event.ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             try {
-                helloDistant.afficher( entree.getText() );
-                entree.setText("");
-                Message dernierMessage = helloDistant.getDernierMessage();
-                reponse.setText( dernierMessage.toString() );
+                remoteHello.show( entry.getText() );
+                entry.setText("");
+                Message lastMessage = remoteHello.getLastMessage();
+                answer.setText( lastMessage.toString() );
             } catch(Exception ex) {
-                reponse.setText ( ex.toString() );
+                answer.setText ( ex.toString() );
             }
         }
     }
 
-    /**
-     ** Le programme principal.
-     **/
-    public static void main (String[] args)
-    {
-        // Obtenir les paramètres ou alors les valeurs par défaut.
-        //
-        String nomServeur = (args.length > 0)?args[0]:"//localhost/Hello";
+    public static void main (String[] args) {
 
-        // Création de l'IHM.
-        //
-        ClientIHM ihm = new ClientIHM("IHM sur un serveur Hello", nomServeur);
+        ClientIHM ihm = new ClientIHM("IHM sur un serveur Hello", (args.length > 0)?args[0]:"//localhost/Hello");
 
-        // Affichage de l'IHM.
-        //
         ihm.pack ();
         ihm.show ();
     }

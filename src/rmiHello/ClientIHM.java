@@ -81,6 +81,6 @@ public class ClientIHM  extends Frame {
         ClientIHM ihm = new ClientIHM("IHM sur un serveur Hello", (args.length > 0)?args[0]:"//localhost/Hello");
 
         ihm.pack ();
-        ihm.show ();
+        ihm.setVisible (true);
     }
 }
